@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Produk - Sabits Store</title>
+    <title>Katalog Produk - Sabit Store</title>
     
     <!-- Impor Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +26,7 @@
     <div class="w-full max-w-md md:max-w-xl mx-auto my-8 md:my-12">
         <!-- Header -->
         <header class="bg-indigo-600 text-white p-6 rounded-t-xl shadow-lg">
-            <h1 class="text-3xl font-bold text-center">Sabits Store</h1>
+            <h1 class="text-3xl font-bold text-center">Sabit Store</h1>
         </header>
 
         <!-- Konten Katalog -->
@@ -48,9 +48,9 @@
         </main>
     </div>
 
-    <!-- Footer ditambahkan di sini -->
+    <!-- Footer -->
     <footer class="text-center text-sm text-gray-500">
-        <p>Made with ❤️ by Sabits Store</p>
+        <p>Made with ❤️ by Sabit Store</p>
     </footer>
 
 
@@ -133,10 +133,11 @@
                     : 'https://placehold.co/600x400/cccccc/ffffff?text=Tanpa+Gambar';
 
                 const phoneNumber = '6283194168199';
-                const message = encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.Nama}`);
+                // --- PEMBARUAN PESAN WHATSAPP ---
+                // Pesan sekarang mencantumkan nama dan harga produk
+                const message = encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.Nama} dengan harga ${product.Harga}.`);
                 const whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
 
-                // --- PEMBARUAN LOGIKA GARANSI ---
                 let warrantyHtml = '';
                 if (product.Garansi) {
                     const warrantyPoints = product.Garansi.split(';').map(point => point.trim()).filter(point => point);
@@ -165,7 +166,6 @@
                             </div>
                             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
                                 <span class="font-medium text-gray-700">Stok Tersedia:</span>
-                                <!-- Kata "unit" sudah dihapus dari sini -->
                                 <span class="font-semibold text-gray-900">${product.Stok || '0'}</span>
                             </div>
                         </div>
@@ -196,4 +196,3 @@
 </body>
 </html>
 
-  
