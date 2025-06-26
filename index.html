@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Produk - Sabits Store</title>
+    
+    <!-- Impor Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Impor Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <!-- Kontainer utama yang lebih responsif -->
+    <div class="w-full max-w-md md:max-w-xl mx-auto my-8 md:my-12">
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white p-6 rounded-t-xl shadow-lg">
+            <h1 class="text-3xl font-bold text-center">Sabits Store</h1>
+        </header>
+
+        <!-- Konten Katalog -->
+        <main class="bg-white p-6 md:p-8 rounded-b-xl shadow-lg">
+            
+            <!-- Pilihan Produk -->
+            <div>
+                <label for="product-select" class="block text-sm font-medium text-gray-700 mb-2">Pilih Produk:</label>
+                <select id="product-select" name="product-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="">-- Silakan Pilih --</option>
+                </select>
+            </div>
+
+            <!-- Detail Produk -->
+            <div id="product-details" class="mt-8 pt-6 border-t border-gray-200 min-h-[200px] flex items-center justify-center">
+                <!-- Konten detail produk akan muncul di sini -->
+                <p class="text-gray-500 text-center">Detail produk akan ditampilkan di sini setelah Anda memilih produk.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer ditambahkan di sini -->
+    <footer class="text-center text-sm text-gray-500">
+        <p>Made with ❤️ by Sabits Store</p>
+    </footer>
+
+
+    <script>
+        // --- KONFIGURASI AIRTABLE (SUDAH DIISI DENGAN DATA ANDA) ---
+        const AIRTABLE_API_KEY = 'patJ0uIDkWsfmCJKX.0d5417fdca0e476f5a51d2cbd49fab6f9737b7ce6cd85e6587aca60f42744a94';
+        const AIRTABLE_BASE_ID = 'appTUxg4WRc8E8dSy';
+        const AIRTABLE_TABLE_NAME = 'Produk'; // <-- PENTING! Ganti ini jika nama tabel Anda berbeda.
+
+        // URL untuk mengambil data dari API Airtable
+        const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
+
+        // --- LOGIKA JAVASCRIPT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('product-select');
+            const productDetailsContainer = document.getElementById('product-details');
+            
+            let productsData = []; 
+
+            async function fetchProducts() {
+                productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Memuat data produk dari Airtable...</p>';
+                productSelect.disabled = true;
+
+                try {
+                    const response = await fetch(airtableUrl, {
+                        headers: {
+                            Authorization: `Bearer ${AIRTABLE_API_KEY}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Error dari Airtable: ${errorData.error.message || response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    productsData = formatAirtableData(data.records);
+                    populateSelect(productsData);
+                    
+                    productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Silakan pilih produk untuk melihat detail.</p>';
+
+                } catch (error) {
+                    console.error('Gagal mengambil data dari Airtable:', error);
+                    productDetailsContainer.innerHTML = `<p class="text-red-600 font-semibold text-center">Gagal memuat data produk. <br>Penyebab: ${error.message}. <br><br>Pastikan API Key, Base ID, dan Nama Tabel sudah benar.</p>`;
+                } finally {
+                    productSelect.disabled = false;
+                }
+            }
+            
+            function formatAirtableData(records) {
+                return records.map(record => ({
+                    id: record.id,
+                    ...record.fields
+                }));
+            }
+
+            function populateSelect(products) {
+                productSelect.innerHTML = '<option value="">-- Silakan Pilih --</option>'; 
+                products.forEach(product => {
+                    if (product.Nama) { 
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = product.Nama;
+                        productSelect.appendChild(option);
+                    }
+                });
+            }
+
+            function updateProductDetails(productId) {
+                if (!productId) {
+                    productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Detail produk akan ditampilkan di sini setelah Anda memilih produk.</p>';
+                    return;
+                }
+
+                const product = productsData.find(p => p.id === productId);
+                if (!product) return;
+                
+                const imageUrl = (product.Gambar && product.Gambar.length > 0) 
+                    ? product.Gambar[0].url 
+                    : 'https://placehold.co/600x400/cccccc/ffffff?text=Tanpa+Gambar';
+
+                const phoneNumber = '6283194168199';
+                const message = encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.Nama}`);
+                const whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
+
+                // --- PEMBARUAN LOGIKA GARANSI ---
+                let warrantyHtml = '';
+                if (product.Garansi) {
+                    const warrantyPoints = product.Garansi.split(';').map(point => point.trim()).filter(point => point);
+                    if (warrantyPoints.length > 0) {
+                        warrantyHtml = `
+                            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                                <p class="font-semibold text-gray-800 mb-2">Ketentuan Garansi:</p>
+                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                    ${warrantyPoints.map(point => `<li>${point}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Template HTML utama
+                const detailsHtml = `
+                    <div class="w-full transition-opacity duration-500">
+                        <img src="${imageUrl}" alt="[Gambar dari ${product.Nama}]" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md bg-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${product.Nama || 'Nama Produk tidak tersedia'}</h2>
+                        <p class="text-gray-600 mb-4">${product.Deskripsi || ''}</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
+                                <span class="font-medium text-gray-700">Harga:</span>
+                                <span class="font-bold text-xl text-indigo-600">${product.Harga || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
+                                <span class="font-medium text-gray-700">Stok Tersedia:</span>
+                                <!-- Kata "unit" sudah dihapus dari sini -->
+                                <span class="font-semibold text-gray-900">${product.Stok || '0'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Menampilkan bagian garansi yang sudah diformat -->
+                        ${warrantyHtml}
+
+                        <!-- Tombol WhatsApp -->
+                        <div class="mt-6">
+                            <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.34 3.48 16.81L2 22L7.33 20.55C8.75 21.35 10.35 21.81 12.04 21.81C17.5 21.81 21.95 17.36 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM16.56 15.31C16.31 15.56 15.68 15.93 15.24 16.09C14.8 16.25 14.28 16.33 13.92 16.19C13.56 16.05 12.69 15.73 11.66 14.78C10.41 13.6 9.69 12.18 9.53 11.82C9.37 11.46 9.5 11.28 9.64 11.14C9.78 11 9.95 10.82 10.11 10.66C10.27 10.5 10.33 10.39 10.45 10.15C10.57 9.91 10.51 9.71 10.43 9.55C10.35 9.39 9.87 8.18 9.67 7.7C9.47 7.22 9.27 7.31 9.13 7.3C8.99 7.29 8.81 7.29 8.65 7.29C8.49 7.29 8.21 7.37 8 7.62C7.79 7.87 7.16 8.44 7.16 9.63C7.16 10.82 8.03 11.96 8.15 12.12C8.27 12.28 9.51 14.31 11.53 15.11C13.55 15.91 13.55 15.58 13.94 15.54C14.33 15.5 15.22 15 15.42 14.4C15.62 13.8 15.62 13.31 15.56 13.19C15.5 13.07 15.34 13.01 15.14 12.91C14.94 12.81 14.46 12.58 14.22 12.48C13.98 12.38 13.84 12.33 13.7 12.57C13.56 12.81 13.11 13.36 12.97 13.52C12.83 13.68 12.69 13.71 12.49 13.61C12.29 13.51 11.65 13.28 10.85 12.56C10.21 11.96 9.77 11.23 9.65 10.99C9.53 10.75 9.65 10.61 9.77 10.5C9.89 10.39 10.03 10.27 10.17 10.15C10.31 10.03 10.37 9.94 10.45 9.78C10.53 9.62 10.47 9.42 10.39 9.26C10.31 9.1 9.83 7.89 9.63 7.41C9.43 6.93 9.25 6.99 9.15 6.99C9.05 6.99 8.89 6.99 8.75 6.99C8.61 6.99 8.35 7.05 8.15 7.29C7.95 7.53 7.35 8.08 7.35 9.25C7.35 10.42 8.21 11.54 8.33 11.7C8.45 11.86 9.69 13.89 11.71 14.69C13.73 15.49 13.73 15.16 14.12 15.12C14.51 15.08 15.4 14.58 15.6 14.02C15.8 13.46 15.8 12.99 15.74 12.87Z"></path></svg>
+                                Pesan via WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                productDetailsContainer.innerHTML = detailsHtml;
+            }
+
+            productSelect.addEventListener('change', (event) => {
+                updateProductDetails(event.target.value);
+            });
+
+            fetchProducts();
+        });
+    </script>
+</body>
+</html>
+
+  
