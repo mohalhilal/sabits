@@ -11,7 +11,7 @@
     <!-- Impor Google Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* Menggunakan font Inter sebagai default */
@@ -20,179 +20,200 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="bg-gray-100 p-4 md:p-8">
 
-    <!-- Kontainer utama yang lebih responsif -->
-    <div class="w-full max-w-md md:max-w-xl mx-auto my-8 md:my-12">
+    <!-- Kontainer utama diperlebar untuk menampung lebih banyak kolom -->
+    <div class="w-full max-w-6xl mx-auto">
         <!-- Header -->
-        <header class="bg-indigo-600 text-white p-6 rounded-t-xl shadow-lg">
-            <h1 class="text-3xl font-bold text-center">Sabit Store</h1>
+        <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-2xl mb-8 p-8 text-center overflow-hidden relative">
+             <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px), radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px; background-position: 0 0, 10px 10px;"></div>
+             <div class="relative z-10">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Sabit Store</h1>
+                <p class="mt-2 text-indigo-200 text-lg">Temukan Penawaran Terbaik Anda di Sini</p>
+            </div>
         </header>
 
         <!-- Konten Katalog -->
-        <main class="bg-white p-6 md:p-8 rounded-b-xl shadow-lg">
-            
-            <!-- Pilihan Produk -->
-            <div>
-                <label for="product-select" class="block text-sm font-medium text-gray-700 mb-2">Pilih Produk:</label>
-                <select id="product-select" name="product-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
-                    <option value="">-- Silakan Pilih --</option>
-                </select>
+        <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+            <!-- Fitur Live Search -->
+            <div class="mb-8">
+                <label for="search-input" class="sr-only">Cari Produk</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="search" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Cari nama produk...">
+                </div>
             </div>
 
-            <!-- Detail Produk -->
-            <div id="product-details" class="mt-8 pt-6 border-t border-gray-200 min-h-[200px] flex items-center justify-center">
-                <!-- Konten detail produk akan muncul di sini -->
-                <p class="text-gray-500 text-center">Detail produk akan ditampilkan di sini setelah Anda memilih produk.</p>
+            <!-- Grid Produk. Class `grid-cols-2` memastikan 2 kolom di tampilan mobile. -->
+            <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+                <!-- Kartu produk akan muncul di sini -->
+                <p class="text-gray-500 col-span-full text-center" id="grid-placeholder">Memuat produk...</p>
             </div>
         </main>
+
+        <!-- Bagian testimoni sudah dihapus dari sini -->
     </div>
 
     <!-- Footer -->
-    <footer class="text-center text-sm text-gray-500">
+    <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Made with ❤️ by Sabit Store</p>
     </footer>
+
+    <!-- Modal untuk Ketentuan Garansi -->
+    <div id="warranty-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full transform transition-all duration-300 scale-95">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h2 id="modal-title" class="text-xl font-bold"></h2>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+            <div id="modal-body" class="text-sm text-gray-700 space-y-2 leading-relaxed">
+            </div>
+            <div class="text-right mt-6">
+                <button id="close-modal-footer-btn" class="bg-indigo-600 text-white py-2 px-5 rounded-lg hover:bg-indigo-700 text-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
 
 
     <script>
         // --- KONFIGURASI AIRTABLE (SUDAH DIISI DENGAN DATA ANDA) ---
         const AIRTABLE_API_KEY = 'patJ0uIDkWsfmCJKX.0d5417fdca0e476f5a51d2cbd49fab6f9737b7ce6cd85e6587aca60f42744a94';
         const AIRTABLE_BASE_ID = 'appTUxg4WRc8E8dSy';
-        const AIRTABLE_TABLE_NAME = 'Produk'; // <-- PENTING! Ganti ini jika nama tabel Anda berbeda.
+        const AIRTABLE_TABLE_NAME = 'Produk'; 
 
-        // URL untuk mengambil data dari API Airtable
         const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
 
         // --- LOGIKA JAVASCRIPT ---
         document.addEventListener('DOMContentLoaded', () => {
-            const productSelect = document.getElementById('product-select');
-            const productDetailsContainer = document.getElementById('product-details');
+            const searchInput = document.getElementById('search-input');
+            const productGrid = document.getElementById('product-grid');
+            const modal = document.getElementById('warranty-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const closeModalFooterBtn = document.getElementById('close-modal-footer-btn');
+
+            let allProducts = []; 
+
+            function openModal(warrantyText, productName) {
+                modalTitle.textContent = `Garansi: ${productName}`;
+                modalBody.innerHTML = `<p>${warrantyText.split(';').join(' ')}</p>`;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
+            }
+
+            function closeModal() {
+                 modal.querySelector('div').classList.add('scale-95');
+                 setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                 }, 300);
+            }
             
-            let productsData = []; 
+            closeModalBtn.addEventListener('click', closeModal);
+            closeModalFooterBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
 
-            async function fetchProducts() {
-                productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Memuat data produk dari Airtable...</p>';
-                productSelect.disabled = true;
-
+            async function fetchAndDisplayProducts() {
                 try {
-                    const response = await fetch(airtableUrl, {
-                        headers: {
-                            Authorization: `Bearer ${AIRTABLE_API_KEY}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(`Error dari Airtable: ${errorData.error.message || response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    productsData = formatAirtableData(data.records);
-                    populateSelect(productsData);
+                    const response = await fetch(airtableUrl, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
+                    if (!response.ok) throw new Error((await response.json()).error.message);
                     
-                    productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Silakan pilih produk untuk melihat detail.</p>';
+                    const data = await response.json();
+                    allProducts = data.records.map(record => ({ id: record.id, ...record.fields }));
+                    displayProducts(allProducts);
 
                 } catch (error) {
                     console.error('Gagal mengambil data dari Airtable:', error);
-                    productDetailsContainer.innerHTML = `<p class="text-red-600 font-semibold text-center">Gagal memuat data produk. <br>Penyebab: ${error.message}. <br><br>Pastikan API Key, Base ID, dan Nama Tabel sudah benar.</p>`;
-                } finally {
-                    productSelect.disabled = false;
+                    productGrid.innerHTML = `<p class="text-red-600 font-semibold text-center col-span-full">Gagal memuat data produk. <br>Penyebab: ${error.message}.</p>`;
                 }
             }
             
-            function formatAirtableData(records) {
-                return records.map(record => ({
-                    id: record.id,
-                    ...record.fields
-                }));
-            }
-
-            function populateSelect(products) {
-                productSelect.innerHTML = '<option value="">-- Silakan Pilih --</option>'; 
-                products.forEach(product => {
-                    if (product.Nama) { 
-                        const option = document.createElement('option');
-                        option.value = product.id;
-                        option.textContent = product.Nama;
-                        productSelect.appendChild(option);
-                    }
-                });
-            }
-
-            function updateProductDetails(productId) {
-                if (!productId) {
-                    productDetailsContainer.innerHTML = '<p class="text-gray-500 text-center">Detail produk akan ditampilkan di sini setelah Anda memilih produk.</p>';
-                    return;
+            function displayProducts(products) {
+                productGrid.innerHTML = '';
+                if (products.length === 0) {
+                     productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">Produk tidak ditemukan.</p>`;
+                } else {
+                     products.forEach(product => {
+                        const card = createProductCard(product);
+                        productGrid.appendChild(card);
+                    });
                 }
+            }
+            
+            function handleSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredProducts = allProducts.filter(product => 
+                    product.Nama && product.Nama.toLowerCase().includes(searchTerm)
+                );
+                displayProducts(filteredProducts);
+            }
+            
+            searchInput.addEventListener('input', handleSearch);
 
-                const product = productsData.find(p => p.id === productId);
-                if (!product) return;
-                
-                const imageUrl = (product.Gambar && product.Gambar.length > 0) 
-                    ? product.Gambar[0].url 
-                    : 'https://placehold.co/600x400/cccccc/ffffff?text=Tanpa+Gambar';
+            function createProductCard(product) {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 flex flex-col";
 
+                const imageUrl = (product.Gambar && product.Gambar.length > 0) ? product.Gambar[0].url : 'https://placehold.co/600x400/cccccc/ffffff?text=Tanpa+Gambar';
                 const phoneNumber = '6283194168199';
-                // --- PEMBARUAN PESAN WHATSAPP ---
-                // Pesan sekarang mencantumkan nama dan harga produk
                 const message = encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.Nama} dengan harga ${product.Harga}.`);
                 const whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
 
-                let warrantyHtml = '';
-                if (product.Garansi) {
-                    const warrantyPoints = product.Garansi.split(';').map(point => point.trim()).filter(point => point);
-                    if (warrantyPoints.length > 0) {
-                        warrantyHtml = `
-                            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                                <p class="font-semibold text-gray-800 mb-2">Ketentuan Garansi:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                                    ${warrantyPoints.map(point => `<li>${point}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
-                    }
+                let warrantyButtonHtml = '';
+                if (product.Garansi && product.Garansi.trim() !== '') {
+                    warrantyButtonHtml = `<button data-warranty="${product.Garansi}" data-product-name="${product.Nama || 'Produk'}" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold mt-2">Ketentuan Garansi</button>`;
                 }
                 
-                // Template HTML utama
-                const detailsHtml = `
-                    <div class="w-full transition-opacity duration-500">
-                        <img src="${imageUrl}" alt="[Gambar dari ${product.Nama}]" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md bg-gray-200">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${product.Nama || 'Nama Produk tidak tersedia'}</h2>
-                        <p class="text-gray-600 mb-4">${product.Deskripsi || ''}</p>
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
+                card.innerHTML = `
+                    <img class="w-full h-24 object-cover" src="${imageUrl}" alt="[Gambar dari ${product.Nama}]">
+                    <div class="p-3 flex flex-col flex-grow">
+                        <h3 class="font-bold text-base mb-1 text-gray-800 leading-tight">${product.Nama || 'N/A'}</h3>
+                        <p class="text-gray-600 text-xs mb-2 flex-grow">${product.Deskripsi || ''}</p>
+                        
+                        <div class="space-y-1 text-xs">
+                            <div class="flex justify-between items-center">
                                 <span class="font-medium text-gray-700">Harga:</span>
-                                <span class="font-bold text-xl text-indigo-600">${product.Harga || 'N/A'}</span>
+                                <span class="font-bold text-base text-indigo-600">${product.Harga || 'N/A'}</span>
                             </div>
-                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
-                                <span class="font-medium text-gray-700">Stok Tersedia:</span>
-                                <span class="font-semibold text-gray-900">${product.Stok || '0'}</span>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-gray-700">Stok:</span>
+                                <span class="font-semibold text-gray-800">${product.Stok || '0'}</span>
                             </div>
                         </div>
 
-                        <!-- Menampilkan bagian garansi yang sudah diformat -->
-                        ${warrantyHtml}
+                        ${warrantyButtonHtml}
 
-                        <!-- Tombol WhatsApp -->
-                        <div class="mt-6">
-                            <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-300 shadow-md">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.34 3.48 16.81L2 22L7.33 20.55C8.75 21.35 10.35 21.81 12.04 21.81C17.5 21.81 21.95 17.36 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM16.56 15.31C16.31 15.56 15.68 15.93 15.24 16.09C14.8 16.25 14.28 16.33 13.92 16.19C13.56 16.05 12.69 15.73 11.66 14.78C10.41 13.6 9.69 12.18 9.53 11.82C9.37 11.46 9.5 11.28 9.64 11.14C9.78 11 9.95 10.82 10.11 10.66C10.27 10.5 10.33 10.39 10.45 10.15C10.57 9.91 10.51 9.71 10.43 9.55C10.35 9.39 9.87 8.18 9.67 7.7C9.47 7.22 9.27 7.31 9.13 7.3C8.99 7.29 8.81 7.29 8.65 7.29C8.49 7.29 8.21 7.37 8 7.62C7.79 7.87 7.16 8.44 7.16 9.63C7.16 10.82 8.03 11.96 8.15 12.12C8.27 12.28 9.51 14.31 11.53 15.11C13.55 15.91 13.55 15.58 13.94 15.54C14.33 15.5 15.22 15 15.42 14.4C15.62 13.8 15.62 13.31 15.56 13.19C15.5 13.07 15.34 13.01 15.14 12.91C14.94 12.81 14.46 12.58 14.22 12.48C13.98 12.38 13.84 12.33 13.7 12.57C13.56 12.81 13.11 13.36 12.97 13.52C12.83 13.68 12.69 13.71 12.49 13.61C12.29 13.51 11.65 13.28 10.85 12.56C10.21 11.96 9.77 11.23 9.65 10.99C9.53 10.75 9.65 10.61 9.77 10.5C9.89 10.39 10.03 10.27 10.17 10.15C10.31 10.03 10.37 9.94 10.45 9.78C10.53 9.62 10.47 9.42 10.39 9.26C10.31 9.1 9.83 7.89 9.63 7.41C9.43 6.93 9.25 6.99 9.15 6.99C9.05 6.99 8.89 6.99 8.75 6.99C8.61 6.99 8.35 7.05 8.15 7.29C7.95 7.53 7.35 8.08 7.35 9.25C7.35 10.42 8.21 11.54 8.33 11.7C8.45 11.86 9.69 13.89 11.71 14.69C13.73 15.49 13.73 15.16 14.12 15.12C14.51 15.08 15.4 14.58 15.6 14.02C15.8 13.46 15.8 12.99 15.74 12.87Z"></path></svg>
-                                Pesan via WhatsApp
+                        <div class="mt-auto pt-3 border-t border-gray-200">
+                             <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-green-500 text-white font-bold py-1.5 px-2 rounded-md hover:bg-green-600 transition duration-300 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.34 3.48 16.81L2 22L7.33 20.55C8.75 21.35 10.35 21.81 12.04 21.81C17.5 21.81 21.95 17.36 21.95 11.91C21.95 6.45 17.5 2 12.04 2Z"/></svg>
+                                Pesan
                             </a>
                         </div>
                     </div>
                 `;
 
-                productDetailsContainer.innerHTML = detailsHtml;
+                const warrantyButton = card.querySelector('button[data-warranty]');
+                if (warrantyButton) {
+                    warrantyButton.addEventListener('click', () => {
+                        openModal(warrantyButton.dataset.warranty, warrantyButton.dataset.productName);
+                    });
+                }
+                
+                return card;
             }
 
-            productSelect.addEventListener('change', (event) => {
-                updateProductDetails(event.target.value);
-            });
-
-            fetchProducts();
+            fetchAndDisplayProducts();
         });
     </script>
 </body>
 </html>
-
