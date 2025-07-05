@@ -11,51 +11,63 @@
     <!-- Impor Google Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         /* Menggunakan font Inter sebagai default */
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
         }
     </style>
 </head>
-<body class="bg-gray-100 p-4 md:p-8">
+<body class="p-4 md:p-8">
 
-    <!-- Kontainer utama diperlebar untuk menampung lebih banyak kolom -->
+    <!-- Kontainer utama -->
     <div class="w-full max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-2xl mb-8 p-8 text-center overflow-hidden relative">
-             <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px), radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px; background-position: 0 0, 10px 10px;"></div>
-             <div class="relative z-10">
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Sabit Store</h1>
-                <p class="mt-2 text-indigo-200 text-lg">Temukan Penawaran Terbaik Anda di Sini</p>
-            </div>
-        </header>
-
-        <!-- Konten Katalog -->
-        <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
-            <!-- Fitur Live Search -->
-            <div class="mb-8">
-                <label for="search-input" class="sr-only">Cari Produk</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <input type="search" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Cari nama produk...">
+        <!-- ===== NAVBAR RESPONSIF ===== -->
+        <nav class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-4 sticky top-4 z-50 mb-10">
+            <div class="flex justify-between items-center">
+                <a href="?" class="text-2xl font-black tracking-tighter text-gray-900">Sabit Store</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="?" class="font-semibold text-gray-600 hover:text-amber-500 transition">Katalog</a>
+                    <a href="?page=checkout" class="relative flex items-center font-semibold text-gray-600 hover:text-amber-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        Keranjang
+                        <span id="cart-count" class="absolute -top-2 -right-3 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
                 </div>
+                <button id="mobile-menu-btn" class="md:hidden">
+                     <svg class="w-6 h-6 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                </button>
+            </div>
+            <!-- Menu Mobile -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
+                 <a href="?" class="block py-2 px-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Katalog</a>
+                 <a href="?page=checkout" class="block py-2 px-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Keranjang</a>
+            </div>
+        </nav>
+
+        <!-- Kontainer untuk "Halaman" yang berbeda -->
+        <div id="page-container">
+            <!-- Halaman Katalog (Default) -->
+            <div id="catalog-page">
+                <main class="bg-white p-6 md:p-8 rounded-2xl shadow-xl">
+                    <div class="mb-8">
+                        <input type="search" id="search-input" class="block w-full pl-4 pr-4 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 sm:text-sm" placeholder="Cari produk favoritmu...">
+                    </div>
+                    <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-6">
+                        <p class="text-gray-500 col-span-full text-center" id="grid-placeholder">Memuat produk...</p>
+                    </div>
+                </main>
             </div>
 
-            <!-- Grid Produk. Class `grid-cols-2` memastikan 2 kolom di tampilan mobile. -->
-            <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
-                <!-- Kartu produk akan muncul di sini -->
-                <p class="text-gray-500 col-span-full text-center" id="grid-placeholder">Memuat produk...</p>
-            </div>
-        </main>
+            <!-- Halaman Detail Produk (Disembunyikan) -->
+            <div id="detail-page" class="hidden"></div>
 
-        <!-- Bagian testimoni sudah dihapus dari sini -->
+            <!-- Halaman Checkout (Disembunyikan) -->
+            <div id="checkout-page" class="hidden"></div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -63,157 +75,232 @@
         <p>Made with ❤️ by Sabit Store</p>
     </footer>
 
-    <!-- Modal untuk Ketentuan Garansi -->
-    <div id="warranty-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50 transition-opacity duration-300">
-        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full transform transition-all duration-300 scale-95">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h2 id="modal-title" class="text-xl font-bold"></h2>
-                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
-            </div>
-            <div id="modal-body" class="text-sm text-gray-700 space-y-2 leading-relaxed">
-            </div>
-            <div class="text-right mt-6">
-                <button id="close-modal-footer-btn" class="bg-indigo-600 text-white py-2 px-5 rounded-lg hover:bg-indigo-700 text-sm">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
-        // --- KONFIGURASI AIRTABLE (SUDAH DIISI DENGAN DATA ANDA) ---
+        // --- KONFIGURASI ---
         const AIRTABLE_API_KEY = 'patJ0uIDkWsfmCJKX.0d5417fdca0e476f5a51d2cbd49fab6f9737b7ce6cd85e6587aca60f42744a94';
         const AIRTABLE_BASE_ID = 'appTUxg4WRc8E8dSy';
-        const AIRTABLE_TABLE_NAME = 'Produk'; 
-
+        const AIRTABLE_TABLE_NAME = 'Produk';
+        const WHATSAPP_NUMBER = '6283194168199';
         const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
 
-        // --- LOGIKA JAVASCRIPT ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('search-input');
-            const productGrid = document.getElementById('product-grid');
-            const modal = document.getElementById('warranty-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            const closeModalFooterBtn = document.getElementById('close-modal-footer-btn');
+        // --- ELEMEN DOM ---
+        const pageContainer = document.getElementById('page-container');
+        const catalogPage = document.getElementById('catalog-page');
+        const detailPage = document.getElementById('detail-page');
+        const checkoutPage = document.getElementById('checkout-page');
+        const productGrid = document.getElementById('product-grid');
+        const searchInput = document.getElementById('search-input');
+        const cartCountEl = document.getElementById('cart-count');
+        
+        let allProducts = [];
+        let cart = [];
 
-            let allProducts = []; 
+        // --- FUNGSI KERANJANG (CART) dengan localStorage ---
+        function loadCart() {
+            cart = JSON.parse(localStorage.getItem('sabitaCart')) || [];
+            updateCartCount();
+        }
+        function saveCart() {
+            localStorage.setItem('sabitaCart', JSON.stringify(cart));
+            updateCartCount();
+        }
+        function addToCart(productId, showNotification = true) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
 
-            function openModal(warrantyText, productName) {
-                modalTitle.textContent = `Garansi: ${productName}`;
-                modalBody.innerHTML = `<p>${warrantyText.split(';').join(' ')}</p>`;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ id: productId, name: product.Nama, price: product.Harga, quantity: 1 });
             }
-
-            function closeModal() {
-                 modal.querySelector('div').classList.add('scale-95');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                 }, 300);
+            saveCart();
+            if (showNotification) {
+                alert(`"${product.Nama}" telah ditambahkan ke keranjang!`);
             }
-            
-            closeModalBtn.addEventListener('click', closeModal);
-            closeModalFooterBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-
-            async function fetchAndDisplayProducts() {
-                try {
-                    const response = await fetch(airtableUrl, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
-                    if (!response.ok) throw new Error((await response.json()).error.message);
-                    
-                    const data = await response.json();
-                    allProducts = data.records.map(record => ({ id: record.id, ...record.fields }));
-                    displayProducts(allProducts);
-
-                } catch (error) {
-                    console.error('Gagal mengambil data dari Airtable:', error);
-                    productGrid.innerHTML = `<p class="text-red-600 font-semibold text-center col-span-full">Gagal memuat data produk. <br>Penyebab: ${error.message}.</p>`;
-                }
+        }
+        function changeQuantity(productId, delta) {
+            const cartItem = cart.find(item => item.id === productId);
+            if (!cartItem) return;
+            cartItem.quantity += delta;
+            if (cartItem.quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                saveCart();
+                renderCheckoutPage(); // Re-render halaman keranjang
             }
-            
-            function displayProducts(products) {
-                productGrid.innerHTML = '';
-                if (products.length === 0) {
-                     productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">Produk tidak ditemukan.</p>`;
-                } else {
-                     products.forEach(product => {
-                        const card = createProductCard(product);
-                        productGrid.appendChild(card);
-                    });
-                }
-            }
-            
-            function handleSearch() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredProducts = allProducts.filter(product => 
-                    product.Nama && product.Nama.toLowerCase().includes(searchTerm)
-                );
-                displayProducts(filteredProducts);
-            }
-            
-            searchInput.addEventListener('input', handleSearch);
+        }
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            renderCheckoutPage(); // Re-render halaman keranjang
+        }
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.textContent = totalItems;
+            const mobileCartCount = document.getElementById('mobile-cart-count');
+            if(mobileCartCount) mobileCartCount.textContent = totalItems;
+        }
+        function buyNow(productId) {
+            addToCart(productId, false); // Tambah ke keranjang tanpa notifikasi
+            window.location.href = '?page=checkout'; // Langsung ke halaman checkout
+        }
 
-            function createProductCard(product) {
+        // --- FUNGSI RENDER HALAMAN ---
+        function renderCatalog(products) {
+            productGrid.innerHTML = '';
+            if (products.length === 0) {
+                productGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">Produk tidak ditemukan.</p>`;
+                return;
+            }
+            products.forEach(product => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-all duration-300 flex flex-col";
-
-                const imageUrl = (product.Gambar && product.Gambar.length > 0) ? product.Gambar[0].url : 'https://placehold.co/600x400/cccccc/ffffff?text=Tanpa+Gambar';
-                const phoneNumber = '6283194168199';
-                const message = encodeURIComponent(`Halo, saya tertarik dengan produk: ${product.Nama} dengan harga ${product.Harga}.`);
-                const whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
-
-                let warrantyButtonHtml = '';
-                if (product.Garansi && product.Garansi.trim() !== '') {
-                    warrantyButtonHtml = `<button data-warranty="${product.Garansi}" data-product-name="${product.Nama || 'Produk'}" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold mt-2">Ketentuan Garansi</button>`;
-                }
+                card.className = "bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col";
+                const imageUrl = (product.Gambar && product.Gambar.length > 0) ? product.Gambar[0].url : 'https://placehold.co/400x400/e2e8f0/94a3b8?text=Gambar';
                 
                 card.innerHTML = `
-                    <img class="w-full h-24 object-cover" src="${imageUrl}" alt="[Gambar dari ${product.Nama}]">
-                    <div class="p-3 flex flex-col flex-grow">
-                        <h3 class="font-bold text-base mb-1 text-gray-800 leading-tight">${product.Nama || 'N/A'}</h3>
-                        <p class="text-gray-600 text-xs mb-2 flex-grow">${product.Deskripsi || ''}</p>
-                        
-                        <div class="space-y-1 text-xs">
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-700">Harga:</span>
-                                <span class="font-bold text-base text-indigo-600">${product.Harga || 'N/A'}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-700">Stok:</span>
-                                <span class="font-semibold text-gray-800">${product.Stok || '0'}</span>
-                            </div>
-                        </div>
-
-                        ${warrantyButtonHtml}
-
-                        <div class="mt-auto pt-3 border-t border-gray-200">
-                             <a href="${whatsappLink}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center bg-green-500 text-white font-bold py-1.5 px-2 rounded-md hover:bg-green-600 transition duration-300 text-xs">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.34 3.48 16.81L2 22L7.33 20.55C8.75 21.35 10.35 21.81 12.04 21.81C17.5 21.81 21.95 17.36 21.95 11.91C21.95 6.45 17.5 2 12.04 2Z"/></svg>
-                                Pesan
-                            </a>
+                    <a href="?product=${product.id}" class="block">
+                        <img class="w-full h-28 object-cover" src="${imageUrl}" alt="${product.Nama}">
+                    </a>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-bold text-base mb-1 text-gray-900 leading-tight flex-grow">${product.Nama || 'N/A'}</h3>
+                        <p class="font-bold text-xl text-amber-500 mb-3">${product.Harga || 'N/A'}</p>
+                        <div class="mt-auto">
+                            <button onclick="addToCart('${product.id}')" class="w-full bg-gray-900 text-white font-bold py-2 px-2 rounded-lg hover:bg-gray-700 text-xs">Tambah Keranjang</button>
                         </div>
                     </div>
                 `;
+                productGrid.appendChild(card);
+            });
+        }
 
-                const warrantyButton = card.querySelector('button[data-warranty]');
-                if (warrantyButton) {
-                    warrantyButton.addEventListener('click', () => {
-                        openModal(warrantyButton.dataset.warranty, warrantyButton.dataset.productName);
+        function renderDetailPage(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) {
+                detailPage.innerHTML = `<p class="text-center text-red-500">Produk tidak ditemukan.</p>`;
+                return;
+            }
+            const imageUrl = (product.Gambar && product.Gambar.length > 0) ? product.Gambar[0].url : 'https://placehold.co/600x600/e2e8f0/94a3b8?text=Gambar';
+            detailPage.innerHTML = `
+                <main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl">
+                    <div class="grid md:grid-cols-2 gap-10">
+                        <img src="${imageUrl}" alt="${product.Nama}" class="w-full rounded-2xl shadow-lg">
+                        <div>
+                            <h1 class="text-4xl font-black tracking-tighter mb-2">${product.Nama}</h1>
+                            <p class="text-4xl font-bold text-amber-500 mb-4">${product.Harga}</p>
+                            <p class="text-gray-600 mb-6">${product.Deskripsi || ''}</p>
+                            ${(product.Garansi) ? `<div class="bg-gray-100 p-4 rounded-lg mb-6">
+                                <h3 class="font-bold mb-2">Ketentuan Garansi</h3>
+                                <p class="text-sm text-gray-600">${product.Garansi.split(';').join(' ')}</p>
+                            </div>` : ''}
+                            <div class="flex space-x-4">
+                                <button onclick="addToCart('${product.id}')" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl hover:bg-gray-300">Tambah Keranjang</button>
+                                <button onclick="buyNow('${product.id}')" class="w-full bg-gray-900 text-white font-bold py-3 px-4 rounded-xl hover:bg-gray-700">Beli Sekarang</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderCheckoutPage() {
+            if (cart.length === 0) {
+                checkoutPage.innerHTML = `<main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl text-center"><h1 class="text-3xl font-black mb-4">Keranjang Belanja</h1><p class="text-gray-500">Keranjang Anda kosong.</p><a href="?" class="mt-4 inline-block bg-amber-500 text-white font-bold py-2 px-4 rounded-lg">Kembali ke Katalog</a></main>`;
+                return;
+            }
+            let itemsHtml = '';
+            let total = 0;
+            cart.forEach(item => {
+                const priceString = item.price || '0';
+                const price = parseFloat(priceString.replace(/[^0-9]/g, ''));
+                const subtotal = price * item.quantity;
+                total += subtotal;
+                itemsHtml += `
+                    <div class="flex justify-between items-center py-4 border-b border-gray-200">
+                        <div class="flex-grow">
+                            <p class="font-bold">${item.name}</p>
+                            <p class="text-sm text-amber-500 font-semibold">${item.price}</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="changeQuantity('${item.id}', -1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeQuantity('${item.id}', 1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold">+</button>
+                        </div>
+                        <div class="w-24 text-right font-semibold">
+                            Rp ${subtotal.toLocaleString('id-ID')}
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="ml-4 text-gray-400 hover:text-red-500">&times;</button>
+                    </div>`;
+            });
+
+            checkoutPage.innerHTML = `
+                <main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl">
+                    <h1 class="text-3xl font-black mb-6">Keranjang Belanja</h1>
+                    <div>${itemsHtml}</div>
+                    <div class="flex justify-between font-bold text-xl border-t-2 border-gray-900 mt-6 pt-4">
+                        <span>Total:</span>
+                        <span>Rp ${total.toLocaleString('id-ID')}</span>
+                    </div>
+                    <button id="order-btn" class="mt-8 w-full bg-green-500 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-600 text-lg">Lanjutkan Pesanan via WhatsApp</button>
+                </main>
+            `;
+
+            document.getElementById('order-btn').addEventListener('click', () => {
+                let orderSummary = "Halo, saya ingin memesan:\n\n";
+                cart.forEach(item => {
+                    orderSummary += `- ${item.name} (x${item.quantity}) - ${item.price}\n`;
+                });
+                orderSummary += `\nTotal: Rp ${total.toLocaleString('id-ID')}`;
+                const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderSummary)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+        }
+
+        // --- ROUTER & INISIALISASI ---
+        async function main() {
+            loadCart();
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
+            try {
+                const response = await fetch(airtableUrl, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
+                if (!response.ok) throw new Error('Gagal mengambil data produk');
+                const data = await response.json();
+                allProducts = data.records.map(record => ({ id: record.id, ...record.fields }));
+                
+                const params = new URLSearchParams(window.location.search);
+                const productId = params.get('product');
+                const page = params.get('page');
+
+                if (productId) {
+                    catalogPage.classList.add('hidden');
+                    checkoutPage.classList.add('hidden');
+                    detailPage.classList.remove('hidden');
+                    renderDetailPage(productId);
+                } else if (page === 'checkout') {
+                    catalogPage.classList.add('hidden');
+                    detailPage.classList.add('hidden');
+                    checkoutPage.classList.remove('hidden');
+                    renderCheckoutPage();
+                } else {
+                    detailPage.classList.add('hidden');
+                    checkoutPage.classList.add('hidden');
+                    catalogPage.classList.remove('hidden');
+                    renderCatalog(allProducts);
+                    searchInput.addEventListener('input', () => {
+                        const searchTerm = searchInput.value.toLowerCase();
+                        const filtered = allProducts.filter(p => p.Nama && p.Nama.toLowerCase().includes(searchTerm));
+                        renderCatalog(filtered);
                     });
                 }
-                
-                return card;
+            } catch (error) {
+                console.error(error);
+                productGrid.innerHTML = `<p class="col-span-full text-center text-red-500">${error.message}</p>`;
             }
+        }
 
-            fetchAndDisplayProducts();
-        });
+        main();
     </script>
 </body>
 </html>
