@@ -31,7 +31,7 @@
                 <a href="?" class="text-2xl font-black tracking-tighter text-gray-900">Sabit Store</a>
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="?" class="font-semibold text-gray-600 hover:text-amber-500 transition">Katalog</a>
-                    <a href="?page=checkout" class="relative flex items-center font-semibold text-gray-600 hover:text-amber-500 transition">
+                    <a href="?page=cart" class="relative flex items-center font-semibold text-gray-600 hover:text-amber-500 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         Keranjang
                         <span id="cart-count" class="absolute -top-2 -right-3 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
@@ -44,7 +44,7 @@
             <!-- Menu Mobile -->
             <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
                  <a href="?" class="block py-2 px-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Katalog</a>
-                 <a href="?page=checkout" class="block py-2 px-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Keranjang</a>
+                 <a href="?page=cart" class="block py-2 px-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Keranjang</a>
             </div>
         </nav>
 
@@ -65,7 +65,10 @@
             <!-- Halaman Detail Produk (Disembunyikan) -->
             <div id="detail-page" class="hidden"></div>
 
-            <!-- Halaman Checkout (Disembunyikan) -->
+            <!-- Halaman Keranjang (Disembunyikan) -->
+            <div id="cart-page" class="hidden"></div>
+            
+            <!-- Halaman Checkout Akhir (Disembunyikan) -->
             <div id="checkout-page" class="hidden"></div>
         </div>
     </div>
@@ -87,6 +90,7 @@
         const pageContainer = document.getElementById('page-container');
         const catalogPage = document.getElementById('catalog-page');
         const detailPage = document.getElementById('detail-page');
+        const cartPage = document.getElementById('cart-page');
         const checkoutPage = document.getElementById('checkout-page');
         const productGrid = document.getElementById('product-grid');
         const searchInput = document.getElementById('search-input');
@@ -127,23 +131,26 @@
                 removeFromCart(productId);
             } else {
                 saveCart();
-                renderCheckoutPage(); // Re-render halaman keranjang
+                renderCartPage();
             }
         }
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
             saveCart();
-            renderCheckoutPage(); // Re-render halaman keranjang
+            renderCartPage();
         }
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             cartCountEl.textContent = totalItems;
-            const mobileCartCount = document.getElementById('mobile-cart-count');
-            if(mobileCartCount) mobileCartCount.textContent = totalItems;
         }
         function buyNow(productId) {
-            addToCart(productId, false); // Tambah ke keranjang tanpa notifikasi
-            window.location.href = '?page=checkout'; // Langsung ke halaman checkout
+            addToCart(productId, false);
+            window.location.href = '?page=cart';
+        }
+        function clearCart() {
+            cart = [];
+            localStorage.removeItem('sabitaCart');
+            updateCartCount();
         }
 
         // --- FUNGSI RENDER HALAMAN ---
@@ -202,10 +209,10 @@
                 </main>
             `;
         }
-
-        function renderCheckoutPage() {
+        
+        function renderCartPage() {
             if (cart.length === 0) {
-                checkoutPage.innerHTML = `<main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl text-center"><h1 class="text-3xl font-black mb-4">Keranjang Belanja</h1><p class="text-gray-500">Keranjang Anda kosong.</p><a href="?" class="mt-4 inline-block bg-amber-500 text-white font-bold py-2 px-4 rounded-lg">Kembali ke Katalog</a></main>`;
+                cartPage.innerHTML = `<main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl text-center"><h1 class="text-3xl font-black mb-4">Keranjang Belanja</h1><p class="text-gray-500">Keranjang Anda kosong.</p><a href="?" class="mt-4 inline-block bg-amber-500 text-white font-bold py-2 px-4 rounded-lg">Kembali ke Katalog</a></main>`;
                 return;
             }
             let itemsHtml = '';
@@ -217,7 +224,7 @@
                 total += subtotal;
                 itemsHtml += `
                     <div class="flex justify-between items-center py-4 border-b border-gray-200">
-                        <div class="flex-grow">
+                        <div class="flex-grow pr-4">
                             <p class="font-bold">${item.name}</p>
                             <p class="text-sm text-amber-500 font-semibold">${item.price}</p>
                         </div>
@@ -226,14 +233,14 @@
                             <span>${item.quantity}</span>
                             <button onclick="changeQuantity('${item.id}', 1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold">+</button>
                         </div>
-                        <div class="w-24 text-right font-semibold">
+                        <div class="w-28 text-right font-semibold">
                             Rp ${subtotal.toLocaleString('id-ID')}
                         </div>
-                        <button onclick="removeFromCart('${item.id}')" class="ml-4 text-gray-400 hover:text-red-500">&times;</button>
+                        <button onclick="removeFromCart('${item.id}')" class="ml-4 text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
                     </div>`;
             });
 
-            checkoutPage.innerHTML = `
+            cartPage.innerHTML = `
                 <main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl">
                     <h1 class="text-3xl font-black mb-6">Keranjang Belanja</h1>
                     <div>${itemsHtml}</div>
@@ -241,18 +248,82 @@
                         <span>Total:</span>
                         <span>Rp ${total.toLocaleString('id-ID')}</span>
                     </div>
-                    <button id="order-btn" class="mt-8 w-full bg-green-500 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-600 text-lg">Lanjutkan Pesanan via WhatsApp</button>
+                    <a href="?page=checkout" class="mt-8 block w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-xl hover:bg-amber-600 text-lg text-center">Lanjutkan ke Pembayaran</a>
+                </main>
+            `;
+        }
+
+        function renderCheckoutPage() {
+            const invoiceNumber = `INV-${Date.now()}`;
+            let itemsHtml = '';
+            let total = 0;
+            cart.forEach(item => {
+                const priceString = item.price || '0';
+                const price = parseFloat(priceString.replace(/[^0-9]/g, ''));
+                const subtotal = price * item.quantity;
+                total += subtotal;
+                itemsHtml += `<li class="flex justify-between py-1"><span class="text-gray-600">${item.name} (x${item.quantity})</span> <span>${item.price}</span></li>`;
+            });
+
+            checkoutPage.innerHTML = `
+                <main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl">
+                    <h1 class="text-3xl font-black mb-2">Konfirmasi Pesanan</h1>
+                    <p class="text-gray-500 mb-6">Pastikan pesanan Anda sudah benar sebelum melanjutkan.</p>
+                    
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="font-bold text-lg">Invoice: ${invoiceNumber}</h2>
+                            <span class="text-sm font-semibold text-green-600">LUNAS (Menunggu Pembayaran)</span>
+                        </div>
+                        <ul class="space-y-1">${itemsHtml}</ul>
+                        <div class="flex justify-between font-bold text-lg border-t border-gray-300 mt-3 pt-3">
+                            <span>Total Bayar:</span>
+                            <span class="text-amber-500">Rp ${total.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="font-bold mb-3">Pilih Metode Pembayaran</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                           <label class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-amber-50 has-[:checked]:border-amber-500">
+                                <input type="radio" name="payment" value="Transfer Bank" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500" checked>
+                                <span class="ml-3 font-semibold">Transfer Bank</span>
+                           </label>
+                           <label class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-amber-50 has-[:checked]:border-amber-500">
+                                <input type="radio" name="payment" value="E-Wallet (Dana/OVO/GoPay)" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                                <span class="ml-3 font-semibold">E-Wallet</span>
+                           </label>
+                        </div>
+                    </div>
+
+                    <button id="order-btn" class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-600 text-lg">Kirim Pesanan ke Admin</button>
                 </main>
             `;
 
             document.getElementById('order-btn').addEventListener('click', () => {
-                let orderSummary = "Halo, saya ingin memesan:\n\n";
+                const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+                let orderSummary = `*PESANAN BARU - SABIT STORE*\n\n`;
+                orderSummary += `*No. Invoice:* ${invoiceNumber}\n\n`;
+                orderSummary += `*Detail Pesanan:*\n`;
                 cart.forEach(item => {
                     orderSummary += `- ${item.name} (x${item.quantity}) - ${item.price}\n`;
                 });
-                orderSummary += `\nTotal: Rp ${total.toLocaleString('id-ID')}`;
+                orderSummary += `\n*Total Tagihan:* Rp ${total.toLocaleString('id-ID')}\n`;
+                orderSummary += `*Metode Pembayaran:* ${selectedPayment}\n\n`;
+                orderSummary += `Mohon info lanjut untuk proses pembayaran. Terima kasih.`;
+                
                 const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderSummary)}`;
-                window.open(whatsappUrl, '_blank');
+                
+                // Tampilkan pesan sukses dan bersihkan keranjang
+                checkoutPage.innerHTML = `
+                    <main class="bg-white p-6 md:p-10 rounded-2xl shadow-xl text-center">
+                        <h1 class="text-3xl font-black mb-4 text-green-500">Pesanan Terkirim!</h1>
+                        <p class="text-gray-600 mb-6">Silakan lanjutkan pembayaran melalui WhatsApp dengan Admin. Invoice Anda adalah <strong class="text-gray-800">${invoiceNumber}</strong>.</p>
+                        <a href="${whatsappUrl}" target="_blank" class="inline-block bg-green-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-green-600 text-lg">Buka WhatsApp</a>
+                        <a href="?" class="mt-4 block text-amber-600 font-semibold">Kembali ke Katalog</a>
+                    </main>
+                `;
+                clearCart();
             });
         }
 
@@ -273,19 +344,22 @@
                 const productId = params.get('product');
                 const page = params.get('page');
 
+                // Sembunyikan semua halaman terlebih dahulu
+                catalogPage.classList.add('hidden');
+                detailPage.classList.add('hidden');
+                cartPage.classList.add('hidden');
+                checkoutPage.classList.add('hidden');
+
                 if (productId) {
-                    catalogPage.classList.add('hidden');
-                    checkoutPage.classList.add('hidden');
                     detailPage.classList.remove('hidden');
                     renderDetailPage(productId);
+                } else if (page === 'cart') {
+                    cartPage.classList.remove('hidden');
+                    renderCartPage();
                 } else if (page === 'checkout') {
-                    catalogPage.classList.add('hidden');
-                    detailPage.classList.add('hidden');
                     checkoutPage.classList.remove('hidden');
                     renderCheckoutPage();
                 } else {
-                    detailPage.classList.add('hidden');
-                    checkoutPage.classList.add('hidden');
                     catalogPage.classList.remove('hidden');
                     renderCatalog(allProducts);
                     searchInput.addEventListener('input', () => {
