@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Watermark Gambar</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Font Inter dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Memuat CSS untuk Coloris (Color Wheel Picker) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            cursor: default; /* Kursor default */
+        }
+        canvas.drawing-mode {
+            cursor: crosshair; /* Kursor saat mode coret aktif */
+        }
+        /* Styling untuk input color picker */
+        .coloris-wrapper {
+            position: relative;
+        }
+        .coloris {
+            width: 100%; height: 2.5rem; padding: 0.5rem; padding-left: 2rem;
+            border: 1px solid #d1d5db; border-radius: 0.5rem; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+        }
+        .coloris:focus { outline: none; border-color: #3b82f6; }
+        .color-swatch {
+            position: absolute; top: 50%; left: 0.5rem; transform: translateY(-50%);
+            width: 1.5rem; height: 1.5rem; border-radius: 0.375rem;
+            border: 1px solid #d1d5db; pointer-events: none;
+        }
+        /* Styling untuk tombol aktif */
+        .btn-active {
+            background-color: #2563eb;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-6">
+        <!-- Judul -->
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Watermark Generator</h1>
+            <p class="text-gray-500 mt-2">Unggah, coret, dan tambahkan watermark pada gambar Anda.</p>
+        </div>
+
+        <!-- Kontrol Utama -->
+        <div class="space-y-4">
+            <div>
+                <label for="imageLoader" class="block text-sm font-medium text-gray-700 mb-1">1. Pilih Gambar</label>
+                <input type="file" id="imageLoader" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"/>
+            </div>
+            <div>
+                <label for="watermarkText" class="block text-sm font-medium text-gray-700 mb-1">2. Ketik Teks Watermark</label>
+                <input type="text" id="watermarkText" placeholder="Contoh: Hak Cipta 2025" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+        </div>
+        
+        <!-- Pengaturan Watermark -->
+        <div class="pt-4 border-t">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Pengaturan Watermark Teks</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="fontSize" class="block text-sm font-medium text-gray-700">Ukuran Font</label>
+                    <input type="range" id="fontSize" min="10" max="200" value="40" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                    <label for="opacity" class="block text-sm font-medium text-gray-700">Transparansi</label>
+                    <input type="range" id="opacity" min="0" max="1" step="0.1" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                     <label for="colorPicker" class="block text-sm font-medium text-gray-700">Warna Teks</label>
+                     <div class="coloris-wrapper">
+                         <input type="text" id="colorPicker" class="coloris" value="#FFFFFF" data-coloris>
+                         <div id="colorSwatch" class="color-swatch" style="background-color: #FFFFFF;"></div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengaturan Coretan -->
+        <div class="pt-4 border-t">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Pengaturan Coretan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="drawModeBtn" class="block text-sm font-medium text-gray-700 mb-1">Mode Coret</label>
+                    <button id="drawModeBtn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Nonaktif</button>
+                </div>
+                <div>
+                    <label for="drawBrushSize" class="block text-sm font-medium text-gray-700">Ukuran Kuas</label>
+                    <input type="range" id="drawBrushSize" min="1" max="100" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                     <label for="drawColorPicker" class="block text-sm font-medium text-gray-700">Warna Kuas</label>
+                     <div class="coloris-wrapper">
+                         <input type="text" id="drawColorPicker" class="coloris" value="#e76f51" data-coloris>
+                         <div id="drawColorSwatch" class="color-swatch" style="background-color: #e76f51;"></div>
+                     </div>
+                </div>
+            </div>
+             <div class="mt-4 text-right">
+                <button id="clearDrawingBtn" class="text-sm text-red-600 hover:text-red-800 font-semibold transition">Hapus Coretan</button>
+            </div>
+        </div>
+
+        <!-- Area Pratinjau -->
+        <div id="previewContainer" class="w-full bg-gray-50 p-4 rounded-lg hidden">
+             <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">Pratinjau</h3>
+             <canvas id="canvas"></canvas>
+        </div>
+
+        <!-- Tombol Download -->
+        <div class="text-center pt-4">
+            <button id="downloadBtn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md hidden">
+                Unduh Gambar
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inisialisasi Coloris untuk kedua pemilih warna
+            Coloris({ el: '.coloris', themeMode: 'light', alpha: true,
+                swatches: ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#ffffff', '#000000']
+            });
+
+            // Elemen DOM
+            const imageLoader = document.getElementById('imageLoader');
+            const watermarkText = document.getElementById('watermarkText');
+            const fontSize = document.getElementById('fontSize');
+            const opacity = document.getElementById('opacity');
+            const colorPicker = document.getElementById('colorPicker');
+            const colorSwatch = document.getElementById('colorSwatch');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const previewContainer = document.getElementById('previewContainer');
+
+            // Elemen DOM untuk fitur Coretan
+            const drawModeBtn = document.getElementById('drawModeBtn');
+            const drawBrushSize = document.getElementById('drawBrushSize');
+            const drawColorPicker = document.getElementById('drawColorPicker');
+            const drawColorSwatch = document.getElementById('drawColorSwatch');
+            const clearDrawingBtn = document.getElementById('clearDrawingBtn');
+
+            // Variabel state
+            let originalImage = null;
+            let isDrawMode = false;
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            // Buat kanvas tersembunyi untuk lapisan coretan
+            const drawingCanvas = document.createElement('canvas');
+            const drawingCtx = drawingCanvas.getContext('2d');
+
+            // Fungsi utama untuk menggambar ulang semua lapisan
+            function renderAll() {
+                if (!originalImage) return;
+
+                // 1. Gambar gambar asli di kanvas utama
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+
+                // 2. Gambar lapisan coretan di atas gambar
+                ctx.drawImage(drawingCanvas, 0, 0);
+
+                // 3. Gambar lapisan watermark teks di atas segalanya
+                const text = watermarkText.value;
+                if (text) {
+                    ctx.save();
+                    ctx.fillStyle = colorPicker.value;
+                    ctx.font = `${fontSize.value}px Inter`;
+                    ctx.globalAlpha = opacity.value;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const hGap = parseInt(fontSize.value) * 5;
+                    const vGap = parseInt(fontSize.value) * 3;
+                    for (let x = -canvas.width; x < canvas.width * 2; x += hGap) {
+                        for (let y = -canvas.height; y < canvas.height * 2; y += vGap) {
+                            ctx.save();
+                            ctx.translate(x, y);
+                            ctx.rotate(-Math.PI / 4);
+                            ctx.fillText(text, 0, 0);
+                            ctx.restore();
+                        }
+                    }
+                    ctx.restore();
+                }
+            }
+
+            // Fungsi untuk menggambar di kanvas coretan
+            function draw(e) {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const currentX = (e.clientX - rect.left) * scaleX;
+                const currentY = (e.clientY - rect.top) * scaleY;
+
+                drawingCtx.strokeStyle = drawColorPicker.value;
+                drawingCtx.lineWidth = drawBrushSize.value;
+                drawingCtx.lineCap = 'round';
+                drawingCtx.lineJoin = 'round';
+                
+                drawingCtx.beginPath();
+                drawingCtx.moveTo(lastX, lastY);
+                drawingCtx.lineTo(currentX, currentY);
+                drawingCtx.stroke();
+                
+                [lastX, lastY] = [currentX, currentY];
+                renderAll(); // Gambar ulang kanvas utama untuk menampilkan coretan
+            }
+
+            // Event Listener untuk memuat gambar
+            imageLoader.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    originalImage = new Image();
+                    originalImage.src = event.target.result;
+                    originalImage.onload = () => {
+                        // Sesuaikan ukuran kedua kanvas
+                        canvas.width = originalImage.width;
+                        canvas.height = originalImage.height;
+                        drawingCanvas.width = originalImage.width;
+                        drawingCanvas.height = originalImage.height;
+                        
+                        previewContainer.classList.remove('hidden');
+                        downloadBtn.classList.remove('hidden');
+                        renderAll();
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Event Listener untuk kontrol watermark
+            watermarkText.addEventListener('input', renderAll);
+            fontSize.addEventListener('input', renderAll);
+            opacity.addEventListener('input', renderAll);
+            document.addEventListener('coloris:pick', event => {
+                // Periksa input mana yang berubah
+                if (event.target === colorPicker) {
+                    colorSwatch.style.backgroundColor = event.detail.color;
+                } else if (event.target === drawColorPicker) {
+                    drawColorSwatch.style.backgroundColor = event.detail.color;
+                }
+                renderAll();
+            });
+
+            // Event Listener untuk fitur Coretan
+            drawModeBtn.addEventListener('click', () => {
+                isDrawMode = !isDrawMode;
+                drawModeBtn.textContent = isDrawMode ? 'Aktif' : 'Nonaktif';
+                drawModeBtn.classList.toggle('btn-active');
+                canvas.classList.toggle('drawing-mode', isDrawMode);
+            });
+            clearDrawingBtn.addEventListener('click', () => {
+                drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                renderAll();
+            });
+            // Tidak perlu listener untuk brush size dan color karena diambil saat menggambar
+
+            // Event Listener untuk menggambar di kanvas
+            canvas.addEventListener('mousedown', (e) => {
+                if (!isDrawMode) return;
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                [lastX, lastY] = [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+            });
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+            // Event Listener untuk Download
+            downloadBtn.addEventListener('click', () => {
+                if (!originalImage) return;
+                const link = document.createElement('a');
+                const originalFileName = imageLoader.files[0]?.name.split('.').slice(0, -1).join('.') || 'gambar';
+                link.download = `final-${originalFileName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+    </script>
+
+</body>
+</html>
